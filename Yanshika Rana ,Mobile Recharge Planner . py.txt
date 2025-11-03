@@ -1,0 +1,178 @@
+Mini Project Report: Mobile Recharge Planner (Phase 1)
+#Name: Yanshika Rana
+#Enrollment Number: 2502140120
+
+# Mobile Recharge Planner
+
+# Password to access the app
+PASSWORD = "admin123"
+
+# Main data structure
+recharge_plans = {}
+def add_recharge_plan():
+    mobile = input("Enter Mobile Number: ")
+    if mobile in recharge_plans:
+        print("Record already exists for this number!")
+        return
+
+    operator = input("Enter Operator Name: ")
+    plan_name = input("Enter Plan Name: ")
+    validity = int(input("Enter Validity (in days): "))
+    amount = float(input("Enter Plan Amount: "))
+
+    from datetime import date
+    recharge_date = (str(date.today()),)
+
+    # Each record
+    recharge_plans[mobile] = {
+        'operator': operator,
+        'plan_name': plan_name,
+        'validity': validity,
+        'amount': amount,
+        'recharge_date': recharge_date,
+        'history': [amount]
+    }
+
+    print("Recharge plan added successfully")
+
+
+def view_all_plans():
+    if not recharge_plans:
+        print("No recharge records found.")
+        return
+
+    print("---- All Recharge Plans ----")
+    for mobile, details in recharge_plans.items():
+        print(f"Mobile: {mobile}")
+        for key, value in details.items():
+            print(f"  {key}: {value}")
+        print("---------------------------")
+    print()
+
+
+def update_recharge_plan():
+    mobile = input("Enter Mobile Number to Update: ")
+    if mobile not in recharge_plans:
+        print("Record not found!\n")
+        return
+
+    print("Enter new details (leave blank to keep current):")
+    plan = recharge_plans[mobile]
+    operator = input(f"Operator ({plan['operator']}): ") or plan['operator']
+    plan_name = input(f"Plan Name ({plan['plan_name']}): ") or plan['plan_name']
+    validity = input(f"Validity ({plan['validity']}): ")
+    validity = int(validity) if validity else plan['validity']
+    amount = input(f"Amount ({plan['amount']}): ")
+    amount = float(amount) if amount else plan['amount']
+
+    plan.update({
+        'operator': operator,
+        'plan_name': plan_name,
+        'validity': validity,
+        'amount': amount
+    })
+    plan['history'].append(amount)
+    print("Recharge plan updated successfully!\n")
+
+
+def delete_recharge_plan():
+    mobile = input("Enter Mobile Number to Delete: ")
+    if mobile in recharge_plans:
+        del recharge_plans[mobile]
+        print("Record deleted successfully!\n")
+    else:
+        print("No such record found!\n")
+
+
+def total_recharge_amount():
+    total = sum(plan['amount'] for plan in recharge_plans.values())
+    print(f"Total Recharge Amount: ₹{total}\n")
+
+
+def average_plan_cost():
+    if not recharge_plans:
+        print("No data to calculate.\n")
+        return
+    avg = sum(plan['amount'] for plan in recharge_plans.values()) / len(recharge_plans)
+    print(f"Average Plan Cost: ₹{avg:.2f}\n")
+
+
+def plans_by_operator():
+    operators = set(plan['operator'] for plan in recharge_plans.values())
+    for op in operators:
+        count = sum(1 for plan in recharge_plans.values() if plan['operator'] == op)
+        print(f"{op}: {count} plans")
+    print()
+
+
+def search_by_mobile():
+    mobile = input("Enter Mobile Number to Search: ")
+    if mobile in recharge_plans:
+        print(recharge_plans[mobile])
+    else:
+        print("No record found for that number.\n")
+
+
+def search_by_operator():
+    op = input("Enter Operator Name: ")
+    found = False
+    for mobile, plan in recharge_plans.items():
+        if plan['operator'].lower() == op.lower():
+            print(f"Mobile: {mobile} -> {plan}")
+            found = True
+    if not found:
+        print("No plans found for that operator.\n")
+
+#main menu
+def main_menu():
+    while True:
+        print("""
+--- Mobile Recharge Planner ---
+1. Add Recharge Plan
+2. View All Plans
+3. Update Recharge Plan
+4. Delete Recharge Plan
+5. Total Recharge Amount
+6. Average Plan Cost
+7. Plans by Operator
+8. Search by Mobile Number
+9. Search by Operator
+10. Exit
+""")
+        choice = input("Enter your choice (1-10): ")
+
+        if choice == "1":
+            add_recharge_plan()
+        elif choice == "2":
+            view_all_plans()
+        elif choice == "3":
+            update_recharge_plan()
+        elif choice == "4":
+            delete_recharge_plan()
+        elif choice == "5":
+            total_recharge_amount()
+        elif choice == "6":
+            average_plan_cost()
+        elif choice == "7":
+            plans_by_operator()
+        elif choice == "8":
+            search_by_mobile()
+        elif choice == "9":
+            search_by_operator()
+        elif choice == "10":
+            print("Exiting... Thank you!")
+            break
+        else:
+            print("Invalid choice, try again.\n")
+
+
+# Startup
+
+if __name__ == "__main__":
+    pwd = input("Enter password to access: ")
+    if pwd == PASSWORD:
+        main_menu()
+    else:
+        print("Incorrect password! Access denied.")
+
+
